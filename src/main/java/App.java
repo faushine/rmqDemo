@@ -5,7 +5,9 @@
 public class App {
 
   public static void main(String[] args) throws Exception {
-    RPCServer server = new RPCServer();
-    server.run();
+    if (args[0]!=null){
+      RPCServer server = new RPCServer();
+      server.run(args[0]);
+    }
   }
 }

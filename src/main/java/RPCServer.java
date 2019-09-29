@@ -12,9 +12,9 @@ public class RPCServer {
 
   private static final String RPC_QUEUE_NAME = "rpc_queue";
 
-  public void run() throws Exception {
+  public void run(String host) throws Exception {
     ConnectionFactory factory = new ConnectionFactory();
-    factory.setHost("localhost");
+    factory.setHost(host);
 
     try (Connection connection = factory.newConnection();
         Channel channel = connection.createChannel()) {

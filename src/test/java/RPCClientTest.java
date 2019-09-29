@@ -1,5 +1,6 @@
 import static org.junit.Assert.*;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.util.concurrent.TimeoutException;
  * @author Yuxin Fan
  * @create 2019-09-29
  */
+@Ignore
 public class RPCClientTest {
 
   String host = "localhost";
@@ -21,7 +23,7 @@ public class RPCClientTest {
       client.run(1);
       times[i] = client.rrt;
     }
-    Utils.formatResult(times, "TCP-Q8", "A1-3");
+    Utils.formatResult(times, "Q8", "A1-3");
   }
 
   @Test
@@ -32,7 +34,7 @@ public class RPCClientTest {
       client.run(1024*1024);
       times[i] = client.rrt;
     }
-    Utils.formatResult(times, "TCP-Q9", "A1-3");
+    Utils.formatResult(times, "Q9", "A1-3");
   }
 
 }
