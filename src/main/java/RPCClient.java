@@ -19,33 +19,27 @@ public class RPCClient {
   private Connection connection;
   private Channel channel;
   private String requestQueueName = "rpc_queue";
+  public long rrt;
+  public long startTime;
 
-  public RPCClient() throws IOException, TimeoutException {
+
+  public RPCClient(String host) throws IOException, TimeoutException {
+    startTime = System.currentTimeMillis();
     ConnectionFactory factory = new ConnectionFactory();
-    factory.setHost("localhost");
-
+    factory.setHost(host);
     connection = factory.newConnection();
     channel = connection.createChannel();
   }
 
-  public static void main(String[] argv) throws IOException {
-    RPCClient rpc = null;
-    long startTime = System.currentTimeMillis();
+  public void run(int size) throws IOException {
     try {
-      rpc = new RPCClient();
-      byte[] buff = new byte[1];
-      for (int i = 0; i < 100; i++) {
-        System.out.println(" [x] Requesting with #" + i + " byte");
-        rpc.call(buff);
-        System.out.println(" [.] Got ack from server");
-      }
-    } catch (IOException | TimeoutException | InterruptedException e) {
+      byte[] buff = new byte[size];
+      call(buff);
+      rrt = System.currentTimeMillis()-startTime;
+      System.out.println(" [.] Got ack from server");
+    } catch (IOException | InterruptedException e) {
       e.printStackTrace();
-    }finally {
-      if (rpc!=null){
-        rpc.close();
-        System.out.println("Average round trip time is "+(System.currentTimeMillis()-startTime)/100+" ms");
-      }
+    } finally {
     }
   }
 
@@ -53,11 +47,8 @@ public class RPCClient {
     final String corrId = UUID.randomUUID().toString();
 
     String replyQueueName = channel.queueDeclare().getQueue();
-    AMQP.BasicProperties props = new AMQP.BasicProperties
-        .Builder()
-        .correlationId(corrId)
-        .replyTo(replyQueueName)
-        .build();
+    AMQP.BasicProperties props = new AMQP.BasicProperties.Builder().correlationId(corrId)
+        .replyTo(replyQueueName).build();
 
     channel.basicPublish("", requestQueueName, props, message);
 
@@ -78,5 +69,27 @@ public class RPCClient {
   public void close() throws IOException {
     connection.close();
   }
+
+//  public static void main(String[] argv) throws IOException {
+//    RPCClient rpc = null;
+//    long startTime = System.currentTimeMillis();
+//    try {
+//      rpc = new RPCClient("localhost");
+//      byte[] buff = new byte[100];
+//      for (int i = 0; i < 100; i++) {
+//        System.out.println(" [x] Requesting with #" + i + " byte");
+//        rpc.call(buff);
+//        System.out.println(" [.] Got ack from server");
+//      }
+//    } catch (IOException | TimeoutException | InterruptedException e) {
+//      e.printStackTrace();
+//    } finally {
+//      if (rpc != null) {
+//        rpc.close();
+//        System.out.println(
+//            "Round trip time is " + (System.currentTimeMillis() - startTime) / 100 + " ms");
+//      }
+//    }
+//  }
 
 }
